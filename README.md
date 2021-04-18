@@ -5,25 +5,22 @@ Primary expectation is to enable model training & visualization in **Google Cola
 
 ### Training Dataset
 **Breast Ultrasound Images Dataset (Dataset BUSI)** [Data Access](https://scholar.cu.edu.eg/?q=afahmy/pages/dataset)
-
-<u>Number of patients</u>: 600 females.
-
-<u>Number of images</u>: 780 PNG images with an average size of 500*500.
-
-<u>Classes</u>: Normal, Benign, Malignant.
+* Number of patients: 600 females.
+* Number of images: 780 PNG images with an average size of 500*500.
+* Classes: Normal, Benign, Malignant.
 
 Both ground truth masks and original images are provided.
 
 ### Models
-- UNet
-- Attention UNet
-- UNet++
-- RCNN-UNet
+* UNet
+* Attention UNet
+* UNet++
+* RCNN-UNet
 
 ### General Workflow
 #### Option 1: 
 Check ``` train_with_Colab.ipynb``` and follow the instructions.
 #### Option 2: 
 1. To download & preprocess the BUSI dataset, run ```BUSI/BUSI_prepare_for_trainging.py```.
-2. Edit the configuration settings in ```configs/<your_config_filename>.json```, or use the default one. 
-3. Run ```python train.py --config configs/<your_config_filename>.json``` to start training.
+2. Edit the configuration settings in ```configs/<your_config_filename>.json```.
+3. Run ```python train.py --config configs/<your_config_filename>.json --device 'index to GPU device' --resume 'path/to/latest/checkpoint' or None``` to start training.
