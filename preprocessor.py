@@ -14,10 +14,9 @@ from PIL import Image
 import random
 
 class BUSIDataProcessor(Dataset):
-    def __init__(self, imgs_dir, masks_dir, resize_img=False):
+    def __init__(self, imgs_dir, masks_dir, resize_img=True):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
-
 
         # Specify desired transformations here:
         self.transformations = transforms.Compose([
@@ -27,12 +26,12 @@ class BUSIDataProcessor(Dataset):
             transforms.RandomRotation(degrees=10)
         ])
 
-        self.resize = resize_img
+        self.resize_img = resize_img
         self.imgs_ids = sorted(os.listdir(imgs_dir))
         self.mask_ids = sorted(os.listdir(masks_dir))
 
     @classmethod
-    def preprocess(cls, img, resize=False, expand_channel=False, adjust_label=False, normalize=False):
+    def preprocess(cls, img, resize_img=True, expand_channel=False, adjust_label=False, normalize=False):
         w, h = img.shape[0], img.shape[1]
 
         if expand_channel:
@@ -44,7 +43,7 @@ class BUSIDataProcessor(Dataset):
             
         img = img.transpose((2, 0, 1))
         
-        if resize:
+        if resize_img:
             new_size = 256
             assert new_size <= w or new_size <= h, 'Resize cannot be greater than image size'
             if expand_channel:
@@ -93,10 +92,10 @@ class BUSIDataProcessor(Dataset):
         img = np.asarray(img).astype('float32')
         mask = np.asarray(mask).astype('float32')
 
-        img = self.preprocess(img, self.resize, expand_channel=False, adjust_label=False, normalize=True)
-        mask = self.preprocess(mask, self.resize, expand_channel=False, adjust_label=True, normalize=False)
+        img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
+        mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
         
-        return {'image': torch.from_numpy(img), 'mask': torch.from_numpy(mask)}
+        return (torch.from_numpy(img), torch.from_numpy(mask))
 
     def __len__(self):
         return len(self.imgs_ids)

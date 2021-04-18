@@ -6,18 +6,18 @@ from preprocessor import BUSIDataProcessor
 
 class BUSIDataLoader(DataLoader):
     def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory):
-        self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=False)
+        self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
         
-        self.n_samples = len(dataset)
+        self.n_samples = len(self.dataset)
         self.shuffle = shuffle
         self.validation_split = validation_split
 
         self.sampler, self.valid_sampler = self._split_sampler(self.validation_split)
 
         self.init_kwargs = {
-            'dataset': dataset,
+            'dataset': self.dataset,
             'batch_size': batch_size,
-            'shuffle': shuffle,
+            'shuffle': self.shuffle,
             'num_workers': num_workers,
             'pin_memory': pin_memory
         }
@@ -35,7 +35,7 @@ class BUSIDataLoader(DataLoader):
         np.random.shuffle(idx_full)
 
         # Validation split can be int (numbers) or percentage
-        if isinstance(split, float):
+        if isinstance(split, int):
             assert split > 0
             assert split < self.n_samples, "validation set size is configured to be larger than entire dataset."
             len_valid = split

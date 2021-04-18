@@ -35,7 +35,7 @@ def main(config):
 
     # get function handles of loss and metrics
     criterion = getattr(losses, config['loss'])
-    metrics = [getattr(metrics, met) for met in config['metrics']]
+    selected_metrics = [getattr(metrics, met) for met in config['metrics']]
 
     # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
@@ -43,7 +43,7 @@ def main(config):
     lr_scheduler = config.init_obj('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
     # Start training
-    trainer = Trainer(model, criterion, metrics, optimizer,
+    trainer = Trainer(model, criterion, selected_metrics, optimizer,
                       config=config,
                       device=device,
                       data_loader=data_loader,

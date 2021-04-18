@@ -9,8 +9,8 @@
     "data_loader": {
         "type": "BUSIDataLoader",
         "args":{
-            "imgs_dir": "BUSI/BUSI_train/images",
-            "masks_dir": "BUSI/BUSI_train/mask_ground_truth",
+            "imgs_dir": "BUSI/BUSI_train/images/",
+            "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
             "resize_img": true,
             "validation_split": 0.2, 
             "batch_size": 32,
@@ -32,7 +32,7 @@
         "avg_iou", "avg_dice_coeff"
     ],
     "lr_scheduler": {
-        "type": "RediceLROnPlateau",
+        "type": "ReduceLROnPlateau",
         "args": {
             "patience": 3,
             "verbose": true

@@ -22,5 +22,5 @@ Both ground truth masks and original images are provided.
 Check ``` train_with_Colab.ipynb``` and follow the instructions.
 #### Option 2: 
 1. To download & preprocess the BUSI dataset, run ```BUSI/BUSI_prepare_for_trainging.py```.
-2. Edit the configuration settings in ```configs/<your_config_filename>.json```.
-3. Run ```python train.py --config configs/<your_config_filename>.json --device 'index to GPU device' --resume 'path/to/latest/checkpoint' or None``` to start training.
+2. Edit the configuration settings in ```options/<your_config_filename>.json```.
+3. Run ```python train.py --config options/<your_config_filename>.json --device 'index to GPU device' --resume 'path/to/latest/checkpoint' or None``` to start training.
