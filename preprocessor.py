@@ -38,18 +38,18 @@ class BUSIDataProcessor(Dataset):
             if len(img.shape) == 2:
                 img = np.dstack([img]*3)
         # For mask, 
-        if len(img.shape) == 2:
-            img = np.expand_dims(img, axis=2)
+        #if len(img.shape) == 2:
+        #    img = np.expand_dims(img, axis=2)
             
         img = img.transpose((2, 0, 1))
         
         if resize_img:
             new_size = 256
             assert new_size <= w or new_size <= h, 'Resize cannot be greater than image size'
-            if expand_channel:
-                img = resize(img, (3, new_size, new_size))
-            else: 
-                img = resize(img, (1, new_size, new_size))
+            
+            img = resize(img, (3, new_size, new_size))
+            #else: 
+            #    img = resize(img, (1, new_size, new_size))
             
         # Standarize pixel values
         if normalize:
@@ -92,8 +92,8 @@ class BUSIDataProcessor(Dataset):
         img = np.asarray(img).astype('float32')
         mask = np.asarray(mask).astype('float32')
 
-        img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
-        mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
+        img = self.preprocess(img, self.resize_img, expand_channel=True, adjust_label=False, normalize=True)
+        mask = self.preprocess(mask, self.resize_img, expand_channel=True, adjust_label=True, normalize=False)
         
         return (torch.from_numpy(img), torch.from_numpy(mask))
 
