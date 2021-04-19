@@ -21,13 +21,31 @@ def avg_iou(target, prediction):
         for index in range(batch_size):
             truth = true_mask[index, 0]
             predicted = pred_mask[index, 0]
-            intersection = np.logical_and(truth, predicted)
-            union = np.logical_or(truth, predicted)
-            run_iou += np.sum(intersection) / np.sum(union)
+            run_iou += iou(truth, predicted)
             
         run_iou /= batch_size
     return run_iou  
   
+def iou(im1, im2, empty_score=0.0):
+    """Calculates the iou for 2 images"""
+
+    im1 = np.asarray(im1).astype(np.bool)
+    im2 = np.asarray(im2).astype(np.bool)
+
+    if im1.shape != im2.shape:
+        raise ValueError("Shape mismatch: im1 and im2 must have the same shape.")
+
+    im1 = im1 > 0.5
+    im2 = im2 > 0.5
+
+    intersection = np.logical_and(im1, im2)
+    union = np.logical_or(im1, im2)
+
+    union_sum = union.sum()
+    if union_sum == 0:
+        return empty_score
+
+    return intersection.sum() / union_sum
 
 def avg_dice_coeff(target, prediction):
     with torch.no_grad():
@@ -47,6 +65,7 @@ def avg_dice_coeff(target, prediction):
             truth = true_mask[index, 0]
             predicted = pred_mask[index, 0]
             run_dice_coeff += dice_coeff(truth, predicted)
+
         run_dice_coeff /= batch_size
     return run_dice_coeff
 
