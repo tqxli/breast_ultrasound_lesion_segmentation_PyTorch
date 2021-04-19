@@ -42,7 +42,7 @@
         "epochs": 100,
 
         "save_dir": "exp_results/",
-        "save_period": 1,
+        "save_period": 10,
         "verbosity": 2,
         
         "monitor": "off",
