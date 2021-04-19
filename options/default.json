@@ -22,20 +22,20 @@
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.001,
+            "lr": 0.0001,
             "weight_decay": 1e-8,
             "amsgrad": true
         }
     },
-    "loss": "DiceBCE_loss",
+    "loss": "BCE_loss",
     "metrics": [
         "avg_iou", "avg_dice_coeff"
     ],
     "lr_scheduler": {
-        "type": "ReduceLROnPlateau",
+        "type": "StepLR",
         "args": {
-            "patience": 3,
-            "verbose": true
+            "gamma": 0.1,
+            "step_size": 10
         }
     },
     "trainer": {
