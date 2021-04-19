@@ -34,7 +34,7 @@ def avg_dice_coeff(target, prediction):
         batch_size = target.shape[0]
         assert batch_size == prediction.shape[0]
 
-        target = torch.sigcoid(target)
+        target = torch.sigmoid(target)
         prediction = torch.sigmoid(prediction)
 
         true_mask = img_as_ubyte(target.cpu().numpy())
