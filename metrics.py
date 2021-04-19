@@ -24,6 +24,7 @@ def avg_iou(target, prediction):
             intersection = np.logical_and(truth, predicted)
             union = np.logical_or(truth, predicted)
             run_iou += np.sum(intersection) / np.sum(union)
+            
         run_iou /= batch_size
     return run_iou  
   

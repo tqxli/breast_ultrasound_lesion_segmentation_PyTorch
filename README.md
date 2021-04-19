@@ -1,5 +1,5 @@
 Experimental implementation for several segmentation models in **PyTorch** for breast ultrasound lesion segmentation. 
-UNDER CONSTRUCTION!
+**UNDER CONSTRUCTION!**
 
 ### Platform
 Expectation is to enable model training & visualization in **Google Colab**, while scripts can be employed for other GPU available environments.
@@ -38,3 +38,6 @@ Check ``` train_with_Colab.ipynb``` and follow the instructions inside.
     ```
     python train.py --config options/<your_config_filename>.json --device 'index to GPU device' --resume 'path/to/latest/checkpoint' or None
     ``` 
+
+### References
+**Template**: PyTorch Template Project https://github.com/victoresque/pytorch-template#acknowledgements
