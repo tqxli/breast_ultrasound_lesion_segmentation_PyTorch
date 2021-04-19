@@ -13,7 +13,7 @@
             "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
             "resize_img": true,
             "validation_split": 0.2, 
-            "batch_size": 32,
+            "batch_size": 16,
             "shuffle": true,
             "num_workers": 0,
             "pin_memory": true
@@ -27,7 +27,7 @@
             "amsgrad": true
         }
     },
-    "loss": "DiceBCELoss",
+    "loss": "DiceBCE_loss",
     "metrics": [
         "avg_iou", "avg_dice_coeff"
     ],
@@ -41,11 +41,11 @@
     "trainer": {
         "epochs": 100,
 
-        "save_dir": "saved/",
+        "save_dir": "exp_results/",
         "save_period": 1,
         "verbosity": 2,
         
-        "monitor": "min val_loss",
+        "monitor": "off",
         "early_stop": 20,
 
         "tensorboard": true

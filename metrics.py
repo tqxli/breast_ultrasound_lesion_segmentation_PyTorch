@@ -1,15 +1,26 @@
 import numpy as np 
 import torch
+import torch.nn.functional as F
+from skimage.util import img_as_float, img_as_ubyte
 
 def avg_iou(target, prediction):
     with torch.no_grad():
+
         run_iou = 0.0
         batch_size = target.shape[0]
         assert batch_size == prediction.shape[0]
 
+        target = torch.sigmoid(target)
+        prediction = torch.sigmoid(prediction)
+
+        true_mask = img_as_ubyte(target.cpu().numpy())
+        convt_target = prediction.cpu().numpy()
+        convt_mask = (convt_target > 0.5) * 255
+        pred_mask = convt_mask.astype(np.uint8)
+
         for index in range(batch_size):
-            truth = target[index, 0]
-            predicted = prediction[index, 0]
+            truth = true_mask[index, 0]
+            predicted = pred_mask[index, 0]
             intersection = np.logical_and(truth, predicted)
             union = np.logical_or(truth, predicted)
             run_iou += np.sum(intersection) / np.sum(union)
@@ -23,9 +34,17 @@ def avg_dice_coeff(target, prediction):
         batch_size = target.shape[0]
         assert batch_size == prediction.shape[0]
 
+        target = torch.sigcoid(target)
+        prediction = torch.sigmoid(prediction)
+
+        true_mask = img_as_ubyte(target.cpu().numpy())
+        convt_target = prediction.cpu().numpy()
+        convt_mask = (convt_target > 0.5) * 255
+        pred_mask = convt_mask.astype(np.uint8) 
+
         for index in range(batch_size):
-            truth = target[index, 0]
-            predicted = prediction[index, 0]
+            truth = true_mask[index, 0]
+            predicted = pred_mask[index, 0]
             run_dice_coeff += dice_coeff(truth, predicted)
         run_dice_coeff /= batch_size
     return run_dice_coeff

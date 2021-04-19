@@ -8,7 +8,7 @@ class DiceBCELoss(nn.Module):
 
     def forward(self, inputs, targets, smooth=1):
         #comment out if your model contains a sigmoid or equivalent activation layer
-        inputs = F.sigmoid(inputs)       
+        inputs = torch.sigmoid(inputs)       
         
         #flatten label and prediction tensors
         inputs = inputs.view(-1)
@@ -27,7 +27,7 @@ class DiceLoss(nn.Module):
 
     def forward(self, inputs, targets, smooth=1):
         #comment out if your model contains a sigmoid or equivalent activation layer
-        inputs = F.sigmoid(inputs)       
+        inputs = torch.sigmoid(inputs)       
         
         #flatten label and prediction tensors
         inputs = inputs.view(-1)
@@ -37,3 +37,9 @@ class DiceLoss(nn.Module):
         dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
         
         return 1 - dice
+
+def DiceBCE_loss(inputs, targets):
+    return DiceBCELoss().foward(inputs, targets)
+
+def Dice_loss(inputs, targets):
+    return DiceLoss().forward(inputs, targets)
