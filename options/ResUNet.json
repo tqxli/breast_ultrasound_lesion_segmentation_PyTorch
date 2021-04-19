@@ -1,0 +1,59 @@
+{
+    "name": "ResUNet",
+    "n_gpu": 1, 
+
+    "arch": {
+        "type": "ResNet_UNet",
+        "args": {    
+            "encoder_name": "resnet18",        
+            "encoder_weights": "imagenet",    
+            "encoder_depth": 5, 
+            "in_channels": 3, 
+            "classes": 1
+        }
+    },
+    "data_loader": {
+        "type": "BUSIDataLoader",
+        "args":{
+            "imgs_dir": "BUSI/BUSI_train/images/",
+            "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
+            "resize_img": true,
+            "validation_split": 0.2, 
+            "batch_size": 16,
+            "shuffle": true,
+            "num_workers": 0,
+            "pin_memory": true
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.001,
+            "weight_decay": 1e-8,
+            "amsgrad": true
+        }
+    },
+    "loss": "BCE_loss",
+    "metrics": [
+        "avg_iou", "avg_dice_coeff"
+    ],
+    "lr_scheduler": {
+        "type": "ReduceLROnPlateau",
+        "args": {
+            "patience": 3,
+            "verbose": true
+        }
+    },
+    "trainer": {
+        "epochs": 100,
+
+        "save_dir": "exp_results/",
+        "save_period": 10,
+        "verbosity": 2,
+        
+        "monitor": "off",
+        "early_stop": 20,
+
+        "tensorboard": true
+    }
+}

@@ -4,6 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from base import BaseModel
 
+import segmentation_models_pytorch as smp
+
 class conv_block(nn.Module):
     def __init__(self, channel_in, channel_out):
         super(conv_block, self).__init__()
@@ -68,7 +70,12 @@ class Attention_block(nn.Module):
 
 #class UNet(nn.Module):
 
-#class ResNet_UNet(nn.Module):
+class ResNet_UNet(BaseModel):
+    def __init__(self, encoder_name = "resnet18", encoder_weights="imagenet", encoder_depth=5, in_channels=3, classes=1, activation='sigmoid'):
+        self.model = smp.Unet(encoder_name=encoder_name, encoder_weights=encoder_weights, encoder_depth=encoder_depth, in_channels=in_channels, classes=classes, activation=activation)
+    
+    def forward(self,x):
+        return self.model(x)
 
 class Attention_UNet(BaseModel):
     def __init__(self, input_channel=3, output_channel=1):

@@ -1,7 +1,7 @@
 import numpy as np 
 import torch
 import torch.nn.functional as F
-from skimage.util import image_as_bool
+from skimage.util import img_as_bool
 
 def avg_iou(target, prediction):
     with torch.no_grad():
