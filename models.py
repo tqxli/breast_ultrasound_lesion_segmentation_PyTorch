@@ -96,7 +96,10 @@ class Attention_UNet(BaseModel):
         self.att3 = Attention_block(filters[1], filters[1], filters[0])
         self.att2 = Attention_block(filters[0], filters[0], int(filters[0]/2))
         
-        self.final = nn.Conv2d(filters[0], output_channel, kernel_size=1, stride=1, padding=0)
+        self.final = nn.Sequential(
+            nn.Conv2d(filters[0], output_channel, kernel_size=1, stride=1, padding=0),
+            nn.Sigmoid()
+        )
 
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
 
