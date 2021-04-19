@@ -8,7 +8,7 @@
             "encoder_name": "resnet18",        
             "encoder_weights": "imagenet",    
             "encoder_depth": 5, 
-            "in_channels": 3, 
+            "in_channels": 1, 
             "classes": 1
         }
     },

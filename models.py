@@ -72,6 +72,7 @@ class Attention_block(nn.Module):
 
 class ResNet_UNet(BaseModel):
     def __init__(self, encoder_name = "resnet18", encoder_weights="imagenet", encoder_depth=5, in_channels=3, classes=1, activation='sigmoid'):
+        super(ResNet_UNet, self).__init__()
         self.model = smp.Unet(encoder_name=encoder_name, encoder_weights=encoder_weights, encoder_depth=encoder_depth, in_channels=in_channels, classes=classes, activation=activation)
     
     def forward(self,x):

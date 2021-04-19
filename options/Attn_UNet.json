@@ -4,7 +4,9 @@
 
     "arch": {
         "type": "Attention_UNet",
-        "args": {}
+        "args": {
+            "input_channel": 1
+        }
     },
     "data_loader": {
         "type": "BUSIDataLoader",
@@ -22,7 +24,7 @@
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.001,
+            "lr": 1e-3,
             "weight_decay": 1e-8,
             "amsgrad": true
         }

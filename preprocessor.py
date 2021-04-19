@@ -93,7 +93,7 @@ class BUSIDataProcessor(Dataset):
         img = np.asarray(img).astype('float32')
         mask = np.asarray(mask).astype('float32')
 
-        img = self.preprocess(img, self.resize_img, expand_channel=True, adjust_label=False, normalize=True)
+        img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
         mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
         
         return (torch.from_numpy(img), torch.from_numpy(mask))

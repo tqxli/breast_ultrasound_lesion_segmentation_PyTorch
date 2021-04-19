@@ -1,7 +1,7 @@
 import zipfile
 from google_drive_downloader import GoogleDriveDownloader as gdd
 
-gdd.download_file_from_google_drive(file_id='1nI_ajCc3vbCbVYNvBeX64U0J81z2GFj5',
+gdd.download_file_from_google_drive(file_id='1_JTLKi8bxfv-DeCvJWiZrsdxi2eCRF9r',
                                     dest_path='./BUSI/BUSI_train.zip',
                                     unzip=True)
                                     
