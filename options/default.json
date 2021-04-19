@@ -1,5 +1,5 @@
 {
-    "name": "UNet",
+    "name": "Attn_UNet",
     "n_gpu": 1, 
 
     "arch": {
@@ -27,7 +27,7 @@
             "amsgrad": true
         }
     },
-    "loss": "BCE_loss",
+    "loss": "DiceBCE_loss",
     "metrics": [
         "avg_iou", "avg_dice_coeff"
     ],

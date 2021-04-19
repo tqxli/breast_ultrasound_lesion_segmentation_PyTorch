@@ -44,5 +44,6 @@ def DiceBCE_loss(inputs, targets):
 def Dice_loss(inputs, targets):
     return DiceLoss().forward(inputs, targets)
 
-#def BCE_loss(inputs, targets):
-#    return F.binary_cross_entropy(inputs, targets, reduction='mean')
+def BCE_loss(inputs, targets):
+    criterion = nn.BCELoss()
+    return criterion(inputs, targets)

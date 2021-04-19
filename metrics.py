@@ -1,7 +1,7 @@
 import numpy as np 
 import torch
 import torch.nn.functional as F
-from skimage.util import img_as_float, img_as_ubyte, image_as_bool
+from skimage.util import image_as_bool
 
 def avg_iou(target, prediction):
     with torch.no_grad():
@@ -10,7 +10,7 @@ def avg_iou(target, prediction):
         batch_size = target.shape[0]
         assert batch_size == prediction.shape[0]
 
-        true_mask = img_as_ubyte(target.cpu().numpy())
+        true_mask = img_as_bool(target.cpu().numpy())
         convt_pred = prediction.cpu().numpy()
         #convt_mask = (convt_target > 0.5) * 255
         #pred_mask = convt_mask.astype(np.uint8)
@@ -45,7 +45,7 @@ def avg_dice_coeff(target, prediction):
         batch_size = target.shape[0]
         assert batch_size == prediction.shape[0]
 
-        true_mask = img_as_ubyte(target.cpu().numpy())
+        true_mask = img_as_bool(target.cpu().numpy())
         convt_pred = prediction.cpu().numpy()
         pred_mask = (convt_pred > 0.5) 
 
