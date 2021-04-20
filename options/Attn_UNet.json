@@ -43,7 +43,7 @@
     "trainer": {
         "epochs": 100,
 
-        "save_dir": "exp_results/",
+        "save_dir": "/content/drive/MyDrive/exp_results/",
         "save_period": 10,
         "verbosity": 2,
         
