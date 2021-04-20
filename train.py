@@ -11,7 +11,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim
 
-import dataloader, models, losses, metrics
+import dataloader.dataloader as dataloader
+import model.models as models
+import model.losses as losses
+import model.metrics as metrics
 from utils import prepare_device
 from trainer import Trainer
 

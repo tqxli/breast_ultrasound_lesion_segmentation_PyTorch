@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler, RandomSampler
                               
-from preprocessor import BUSIDataProcessor
+from .preprocessor import BUSIDataProcessor
 
 class BUSIDataLoader(DataLoader):
     def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory):
