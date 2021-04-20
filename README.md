@@ -1,5 +1,4 @@
 Experimental implementation for several segmentation models in **PyTorch** for breast ultrasound lesion segmentation. 
-**UNDER CONSTRUCTION!**
 
 ### Platform
 Expectation is to enable model training & visualization in **Google Colab**, while scripts can be employed for other GPU available environments.
@@ -10,13 +9,15 @@ Expectation is to enable model training & visualization in **Google Colab**, whi
 * Number of images: 780 PNG images with an average size of 500*500.
 * Classes: Normal, Benign, Malignant.
 
-Both ground truth masks and original images are provided.
+Both ground truth masks and original images are provided. 
+
+Normal images are not used during training.
 
 ### Models
-* UNet (with ResNet18 backbone)
+* UNet with ResNet backbone (ResUNet)
+* ResUNet with attention
 * Attention UNet
-* UNet++
-* RCNN-UNet
+* Multi-Attention Net (MA-Net)
 
 ### General Workflow
 #### Option 1: 
@@ -40,4 +41,5 @@ Check ``` train_with_Colab.ipynb``` and follow the instructions inside.
     ``` 
 
 ### References
-**Template**: PyTorch Template Project https://github.com/victoresque/pytorch-template#acknowledgements
+**Template**: PyTorch Template Project https://github.com/victoresque/pytorch-template#pytorch-template-project
+**Library**: Segmentation Models https://smp.readthedocs.io/en/latest/

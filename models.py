@@ -68,8 +68,6 @@ class Attention_block(nn.Module):
 
         return out
 
-#class UNet(nn.Module):
-
 class ResNet_UNet(BaseModel):
     def __init__(self, encoder_name = "resnet18", encoder_weights="imagenet", encoder_depth=5, in_channels=1, classes=1, activation='sigmoid'):
         super(ResNet_UNet, self).__init__()
