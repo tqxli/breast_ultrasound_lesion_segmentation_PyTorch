@@ -1,2 +1,2 @@
 googledrivedownloader
--U git+https://github.com/qubvel/segmentation_models.pytorch
+git+https://github.com/qubvel/segmentation_models.pytorch
