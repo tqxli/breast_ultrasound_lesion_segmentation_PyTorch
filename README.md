@@ -20,7 +20,7 @@ Normal images are not used during training.
 * UNet with ResNet backbone (ResUNet)
 * ResUNet with attention
 * Attention UNet
-* Multi-Attention Net (MA-Net)
+* Multi-scale Attention Net (MA-Net)
 
 ### General Workflow
 #### Option 1: 
