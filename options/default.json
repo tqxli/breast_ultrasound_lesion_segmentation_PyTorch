@@ -1,15 +1,17 @@
 {
-    "name": "Attn_ResUNet",
+    "name": "Attn_ResUNet_plus_classification",
     "n_gpu": 1, 
 
     "arch": {
         "type": "Attention_ResUNet",
         "args": {
-            "aux_params": [{"pooling": "max",             
-                            "dropout": 0.1,               
-                            "activation": "softmax",    
-                            "classes": 3
-           }]   }
+            "aux_params": {
+                "pooling": "max",             
+                "dropout": 0.1,               
+                "activation": "softmax",    
+                "classes": 3
+            }  
+        }
     },
     "data_loader": {
         "type": "BUSIDataLoader",

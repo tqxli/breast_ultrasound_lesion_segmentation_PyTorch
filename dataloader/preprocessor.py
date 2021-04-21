@@ -111,7 +111,7 @@ class BUSIDataProcessor_with_labels(Dataset):
         self.labels_dir = labels_dir
         self.labels = pd.read_csv(labels_dir)['labels']
 
-        self.num_normal_samples = np.sum(labels == 2)
+        self.normal_samples_idx = (labels == 2)
 
         # Specify desired data transformations here:
         self.transformations = transforms.Compose([
@@ -164,8 +164,8 @@ class BUSIDataProcessor_with_labels(Dataset):
 
         return img
 
-    def get_num_normal_samples(self):
-        return self.num_normal_samples
+    def get_normal_samples_idx(self):
+        return self.normal_samples_idx
 
     def __getitem__(self, i):
         img_idx = self.imgs_ids[i]
@@ -196,7 +196,7 @@ class BUSIDataProcessor_with_labels(Dataset):
         mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
         label = np.asarray(self.labels[i])
         
-        return (torch.from_numpy(img), torch.from_numpy(mask), F.one_hot(torch.from_numpy(label), 3))
+        return (torch.from_numpy(img), torch.from_numpy(mask), torch.from_numpy(label))
 
     def __len__(self):
         return len(self.imgs_ids)

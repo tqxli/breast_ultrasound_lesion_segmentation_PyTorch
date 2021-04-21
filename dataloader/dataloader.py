@@ -13,7 +13,7 @@ class BUSIDataLoader(DataLoader):
         
         self.n_samples = len(self.dataset)
 
-        #self.n_normal_samples = self.dataset.get_num_normal_samples()
+        self.normal_samples_idx = self.dataset.get_normal_samples_idx()
 
         self.shuffle = shuffle
         self.validation_split = validation_split
@@ -35,10 +35,12 @@ class BUSIDataLoader(DataLoader):
             return None, None
 
         idx_full = np.arange(self.n_samples)
+        idx_exclude_from_valid = idx_full[self.normal_samples_idx]
+        idx_rest = np.delete(idx_full, idx_exclude_from_valid)
 
-        #np.random.seed(0)
+        np.random.seed(0)
         # Shuffle indexes
-        #np.random.shuffle(idx_full)
+        np.random.shuffle(idx_rest)
 
         # Validation split can be int (numbers) or percentage
         if isinstance(split, int):
@@ -48,7 +50,8 @@ class BUSIDataLoader(DataLoader):
         else:
             len_valid = int(self.n_samples * split)
 
-        valid_idx = idx_full[0:len_valid]
+        # Validation only on segmentation
+        valid_idx = idx_rest[0:len_valid]
         train_idx = np.delete(idx_full, np.arange(0, len_valid))
 
         """
