@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class DiceBCELoss(nn.Module):
-    def __init__(self, weight=None, size_average=True):
+    def __init__(self, alpha = 0.5, weight=None, size_average=True):
+        self.alpha = alpha
         super(DiceBCELoss, self).__init__()
 
     def forward(self, inputs, targets, smooth=1):
@@ -17,7 +18,7 @@ class DiceBCELoss(nn.Module):
         intersection = (inputs * targets).sum()                            
         dice_loss = 1 - (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
         BCE = F.binary_cross_entropy(inputs, targets, reduction='mean')
-        Dice_BCE = BCE + dice_loss
+        Dice_BCE = (1-self.alpha) * BCE + self.alpha.dice_loss
         
         return Dice_BCE
 
@@ -38,6 +39,27 @@ class DiceLoss(nn.Module):
         
         return 1 - dice
 
+class DiceBCE_CE_JointLoss(nn.Module):
+    """
+    A custom loss for combining segmentation DiceBCE loss with an additional classification Cross Entropy loss.
+    Parameters:
+        beta: a scalar that controls ratio between the two losses.
+    """
+    def __init__(self, beta=0.5):
+        super(DiceBCE_CE_JointLoss, self).__init__()
+        self.beta = beta
+    
+    def forward(self, inputs, targets, pred_labels, true_labels, classification_class=2):
+        classification_criterion = nn.CrossEntropyLoss()
+
+        idx = true_labels != classification_class
+
+        classification_loss = classification_criterion(pred_labels, true_labels)
+        segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
+
+        return (1-self.beta) * classification_loss + self.beta * segmentation_loss 
+
+
 def DiceBCE_loss(inputs, targets):
     return DiceBCELoss().forward(inputs, targets)
 
@@ -49,14 +71,12 @@ def BCE_loss(inputs, targets):
     return criterion(inputs, targets)
 
 def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
-    """
-    A custom loss which incorporates both segmentation (DiceBCE) and classification loss (Cross Entropy).
-    """
-    classification_criterion = nn.CrossEntropyLoss()
+    return DiceBCE_CE_JointLoss().forward(inputs, targets, pred_labels, true_labels, classification_class)
+    # classification_criterion = nn.CrossEntropyLoss()
 
-    idx = true_labels != classification_class
+    # idx = true_labels != classification_class
 
-    classification_loss = classification_criterion(pred_labels, true_labels)
-    segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
+    # classification_loss = classification_criterion(pred_labels, true_labels)
+    # segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
 
-    return classification_loss + segmentation_loss
+    # return classification_loss + segmentation_loss

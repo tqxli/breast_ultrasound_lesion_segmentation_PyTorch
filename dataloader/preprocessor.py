@@ -4,7 +4,6 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
 import os
-from os import listdir
 from torchvision import transforms
 from numpy import clip
 import pandas as pd
@@ -14,9 +13,9 @@ from skimage.util import img_as_float, img_as_ubyte
 from skimage.transform import resize
 from PIL import Image
 import random
+import io
 
 class BUSIDataProcessor(Dataset):
-
     def __init__(self, imgs_dir, masks_dir, resize_img=True):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
@@ -109,9 +108,9 @@ class BUSIDataProcessor_with_labels(Dataset):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
         self.labels_dir = labels_dir
-        self.labels = pd.read_csv(labels_dir)['labels']
+        self.labels = pd.read_csv(labels_dir)['labels'].to_numpy()
 
-        self.normal_samples_idx = (labels == 2)
+        self.normal_samples_idx = (self.labels == 2)
 
         # Specify desired data transformations here:
         self.transformations = transforms.Compose([
@@ -200,3 +199,18 @@ class BUSIDataProcessor_with_labels(Dataset):
 
     def __len__(self):
         return len(self.imgs_ids)
+
+class TestDataset(Dataset):
+    def __init__(self, imgs_dir):
+        self.imgs_dir = imgs_dir
+        self.imgs_id = os.listdir(imgs_dir)
+        self.processor = BUSIDataProcessor(imgs_dir=None, masks_dir=None)
+
+    def __len__(self):
+        return len(self.imgs_id)
+
+    def __getitem__(self, i):
+        img = io.imread(self.imgs_dir + self.imgs_id[i])
+        processed_img = self.processor.preprocess(img, resize_img=True, expand_channel=False, adjust_label=False, normalize=True)
+        
+        return {processed_img}

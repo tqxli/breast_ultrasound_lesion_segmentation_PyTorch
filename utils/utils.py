@@ -4,7 +4,8 @@ import pandas as pd
 from pathlib import Path
 from itertools import repeat
 from collections import OrderedDict
-
+import numpy as np
+from moviepy.editor import ImageSequenceClip
 
 def ensure_dir(dirname):
     dirname = Path(dirname)
@@ -65,3 +66,20 @@ class MetricTracker:
 
     def result(self):
         return dict(self._data.average)
+
+def gif(filename, array, fps=10, scale=1.0):
+    """Creates a gif given a stack of images using moviepy
+    >>> X = randn(100, 64, 64)
+    >>> gif('test.gif', X)
+    """
+    # ensure that the file has the .gif extension
+    filename = filename + '.gif'
+
+    # copy into the color dimension if the images are black and white
+    if array.ndim == 3:
+        array = array[..., np.newaxis] * np.ones(3)
+
+    # make the moviepy clip
+    clip = ImageSequenceClip(list(array), fps=fps).resize(scale)
+    clip.write_gif(filename, fps=fps)
+    return True
