@@ -47,3 +47,13 @@ def Dice_loss(inputs, targets):
 def BCE_loss(inputs, targets):
     criterion = nn.BCELoss()
     return criterion(inputs, targets)
+
+def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
+    classification_criterion = nn.CrossEntropyLoss()
+
+    idx = true_labels != classification_class
+
+    classification_loss = classification_criterion(pred_labels, true_labels)
+    segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
+
+    return classification_loss + segmentation_loss

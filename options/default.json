@@ -1,9 +1,9 @@
 {
-    "name": "Attn_UNet",
+    "name": "Attn_ResUNet",
     "n_gpu": 1, 
 
     "arch": {
-        "type": "Attention_UNet",
+        "type": "Attention_ResUNet",
         "args": {}
     },
     "data_loader": {
@@ -16,7 +16,14 @@
             "batch_size": 16,
             "shuffle": true,
             "num_workers": 0,
-            "pin_memory": true
+            "pin_memory": true,
+            "do_classification": true,
+            "labels_dir": "BUSI/BUSI_train/classes.csv",
+            "aux_params": [{"pooling": "max",             
+                            "dropout": 0.1,               
+                            "activation": "sigmoid",     
+                            "classes": 3
+                           }]           
         }
     },
     "optimizer": {

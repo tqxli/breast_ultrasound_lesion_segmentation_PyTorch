@@ -2,11 +2,14 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler, RandomSampler
                               
-from .preprocessor import BUSIDataProcessor
+from .preprocessor import BUSIDataProcessor, BUSIDataProcessor_with_labels
 
 class BUSIDataLoader(DataLoader):
-    def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory):
-        self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
+    def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory, do_classification=False, labels_dir=None):
+        if do_classification and labels_dir is not None:
+            self.dataset = BUSIDataProcessor_with_labels(imgs_dir, masks_dir, labels_dir, resize_img=True)
+        else:
+            self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
         
         self.n_samples = len(self.dataset)
         self.shuffle = shuffle

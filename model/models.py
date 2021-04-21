@@ -159,9 +159,11 @@ class Attention_UNet(BaseModel):
         return out
 
 class Attention_ResUNet(BaseModel):
-    def __init__(self, encoder_name = "resnet18", encoder_weights="imagenet", encoder_depth=5, in_channels=1, classes=1, activation='sigmoid'):
+    def __init__(self, encoder_name = "resnet18", encoder_weights="imagenet", encoder_depth=5, in_channels=1, classes=1, activation='sigmoid', aux_params=None):
         super(Attention_ResUNet, self).__init__()
-        self.model = smp.Unet(encoder_name=encoder_name, encoder_weights=encoder_weights, encoder_depth=encoder_depth, in_channels=in_channels, classes=classes, activation=activation, decoder_attention_type='scse')
+        self.model = smp.Unet(encoder_name=encoder_name, encoder_weights=encoder_weights, encoder_depth=encoder_depth, 
+                              in_channels=in_channels, classes=classes, activation=activation, decoder_attention_type='scse',
+                              aux_params=aux_params)
     
     def forward(self,x):
         return self.model(x)
