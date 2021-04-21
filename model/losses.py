@@ -49,6 +49,9 @@ def BCE_loss(inputs, targets):
     return criterion(inputs, targets)
 
 def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
+    """
+    A custom loss which incorporates both segmentation (DiceBCE) and classification loss (Cross Entropy).
+    """
     classification_criterion = nn.CrossEntropyLoss()
 
     idx = true_labels != classification_class

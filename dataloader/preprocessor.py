@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import Dataset, DataLoader
+import torch.nn.functional as F
 import os
 from os import listdir
 from torchvision import transforms
@@ -108,6 +109,9 @@ class BUSIDataProcessor_with_labels(Dataset):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
         self.labels_dir = labels_dir
+        self.labels = pd.read_csv(labels_dir)['labels']
+
+        self.num_normal_samples = np.sum(labels == 2)
 
         # Specify desired data transformations here:
         self.transformations = transforms.Compose([
@@ -160,6 +164,9 @@ class BUSIDataProcessor_with_labels(Dataset):
 
         return img
 
+    def get_num_normal_samples(self):
+        return self.num_normal_samples
+
     def __getitem__(self, i):
         img_idx = self.imgs_ids[i]
         mask_idx = self.mask_ids[i]
@@ -187,10 +194,9 @@ class BUSIDataProcessor_with_labels(Dataset):
 
         img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
         mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
-
-        labels = pd.read_csv(self.labels_dir)['labels'].to_numpy().astype(int)
+        label = np.asarray(self.labels[i])
         
-        return (torch.from_numpy(img), torch.from_numpy(mask), labels)
+        return (torch.from_numpy(img), torch.from_numpy(mask), F.one_hot(torch.from_numpy(label), 3))
 
     def __len__(self):
         return len(self.imgs_ids)

@@ -12,6 +12,9 @@ class BUSIDataLoader(DataLoader):
             self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
         
         self.n_samples = len(self.dataset)
+
+        #self.n_normal_samples = self.dataset.get_num_normal_samples()
+
         self.shuffle = shuffle
         self.validation_split = validation_split
 
@@ -33,9 +36,9 @@ class BUSIDataLoader(DataLoader):
 
         idx_full = np.arange(self.n_samples)
 
-        np.random.seed(0)
+        #np.random.seed(0)
         # Shuffle indexes
-        np.random.shuffle(idx_full)
+        #np.random.shuffle(idx_full)
 
         # Validation split can be int (numbers) or percentage
         if isinstance(split, int):
