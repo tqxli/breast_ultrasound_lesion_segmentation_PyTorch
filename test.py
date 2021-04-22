@@ -7,6 +7,25 @@ import numpy as np
 import argparse
 from parse_config import ConfigParser
 import torch
+from dataloader.preprocessor import BUSIDataProcessor
+
+def get_prediction(model, path_to_image=None):
+    if path_to_image:
+        image = io.imread(path_to_image)
+            
+        dataset = BUSIDataProcessor(imgs_dir=None, masks_dir=None)
+        processed = dataset.preprocess(image, new_size=256, expand_channel=False, adjust_label=False, normalize=True)
+        img = torch.from_numpy(np.expand_dims(processed, axis=0))
+            
+        with torch.no_grad():
+            model.eval()
+            data = img.to(self.device, dtype=torch.float)
+            mask, _ = self.model(data)
+            mask_thresh = mask > 0.5
+            image_pred = (mask_thresh.cpu().numpy() * 255)
+            image_pred = image_pred.astype(np.uint8)
+
+    return image_pred[0, 0]
 
 def segment_3d_input(model, path_to_image):
     if path_to_image:
@@ -18,8 +37,9 @@ def segment_3d_input(model, path_to_image):
         for image in image_list:
             img_path = os.path.join(path_to_image, image)
             img = io.imread(img_path) 
-            mask = model.get_prediction(img_path) 
             
+            mask = get_prediction(model, img_path)
+
             segmented_img = apply_mask_to_image(img, mask)      
             segmented_volume.append(segmented_img)
 
