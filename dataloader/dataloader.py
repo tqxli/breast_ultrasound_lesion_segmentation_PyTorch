@@ -8,13 +8,12 @@ class BUSIDataLoader(DataLoader):
     def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory, do_classification=False, labels_dir=None):
         if do_classification and labels_dir is not None:
             self.dataset = BUSIDataProcessor_with_labels(imgs_dir, masks_dir, labels_dir, resize_img=True)
+            self.normal_samples_idx = self.dataset.get_normal_samples_idx()
         else:
             self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
+            self.normal_samples_idx = []
         
         self.n_samples = len(self.dataset)
-
-        self.normal_samples_idx = self.dataset.get_normal_samples_idx()
-
         self.shuffle = shuffle
         self.validation_split = validation_split
 

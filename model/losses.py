@@ -18,7 +18,7 @@ class DiceBCELoss(nn.Module):
         intersection = (inputs * targets).sum()                            
         dice_loss = 1 - (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
         BCE = F.binary_cross_entropy(inputs, targets, reduction='mean')
-        Dice_BCE = (1-self.alpha) * BCE + self.alpha.dice_loss
+        Dice_BCE = (1-self.alpha) * BCE + self.alpha * dice_loss
         
         return Dice_BCE
 
