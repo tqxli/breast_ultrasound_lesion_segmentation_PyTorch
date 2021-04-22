@@ -8,29 +8,31 @@ import argparse
 from parse_config import ConfigParser
 import torch
 from dataloader.preprocessor import BUSIDataProcessor
+from model import models
+from utils import prepare_device
 
-def get_prediction(model, path_to_image=None):
+def get_prediction(model, device, path_to_image=None):
     if path_to_image:
         image = io.imread(path_to_image)
             
         dataset = BUSIDataProcessor(imgs_dir=None, masks_dir=None)
-        processed = dataset.preprocess(image, new_size=256, expand_channel=False, adjust_label=False, normalize=True)
+        processed = dataset.preprocess(image, expand_channel=False, adjust_label=False, normalize=True)
         img = torch.from_numpy(np.expand_dims(processed, axis=0))
             
         with torch.no_grad():
             model.eval()
-            data = img.to(self.device, dtype=torch.float)
-            mask, _ = self.model(data)
+            data = img.to(device, dtype=torch.float)
+            mask = model(data)
             mask_thresh = mask > 0.5
             image_pred = (mask_thresh.cpu().numpy() * 255)
             image_pred = image_pred.astype(np.uint8)
 
     return image_pred[0, 0]
 
-def segment_3d_input(model, path_to_image):
+def segment_3d_input(model, device, path_to_image):
     if path_to_image:
         # Read from directory
-        image_list = sorted(os.listdir(path_to_image))
+        image_list = os.listdir(path_to_image)
         
         segmented_volume = []
 
@@ -38,7 +40,7 @@ def segment_3d_input(model, path_to_image):
             img_path = os.path.join(path_to_image, image)
             img = io.imread(img_path) 
             
-            mask = get_prediction(model, img_path)
+            mask = get_prediction(model, device, img_path)
 
             segmented_img = apply_mask_to_image(img, mask)      
             segmented_volume.append(segmented_img)
@@ -64,7 +66,7 @@ def apply_mask_to_image(img, mask):
 
     return segmented_img
 
-def saveImgWithSegmentations(segmented_volume, volume_name, save_dir):    
+def saveImgWithSegmentations(segmented_volume, volume_name, model_name, save_dir):    
     """
     Save the 3d ultrasound with segmentations as nrrd and gif (for better visualization)
     """
@@ -75,40 +77,40 @@ def saveImgWithSegmentations(segmented_volume, volume_name, save_dir):
     gray3d = np.asarray(gray3d)
     gray3d = np.transpose(gray3d, (2, 1, 0))
 
-    filename = volume_name + '_segmentation'
+    filename = volume_name + '_' + model_name
 
     # Save as nrrd
-    nrrd.write(filename=save_dir+filename+'.nrrd', data=gray3d)
-    print('Successfully save results as nrrd.')
+    #nrrd.write(filename=save_dir+filename+'.nrrd', data=gray3d)
+    #print('Successfully save results as nrrd.')
 
-    # Save as gif
+    # Save as gif (fps=5 is recommended)
     img_seq = gray3d.transpose((2, 1, 0)) * 255.0
     img_seq = img_seq.astype(np.uint8)
-    if gif(filename, img_seq):
+    if gif(save_dir+filename, img_seq, fps=5):
         print('Successfully save results as gif.')
 
-
-if __name__ == "__main__"':
+if __name__ == "__main__":
     # Load checkpoints for inference
-    path_to_checkpoint = '/content/drive/MyDrive/exp_results/models/Attn_ResUNet_plus_classification/0421_214038/checkpoint-epoch100.pth' 
+    path_to_checkpoint = '/content/drive/MyDrive/exp_results/models/ResUNet/0422_001740/checkpoint-epoch100.pth'
     checkpoint = torch.load(path_to_checkpoint)
 
     # Select test images
     path_to_image = '/content/drive/MyDrive/data/sample_test_volumes/'
-    volume_list = os.listdir(path_to_image)
-    volume_name = volume_list[0]
+    volume_list = sorted(os.listdir(path_to_image))
+    volume_name = volume_list[1]
 
     # Initialize model
     args = argparse.ArgumentParser(description='Inference configuration')
-
     args.add_argument('--config', type=str, default='options/default.json', 
                       help='config path to correct model architecture')
-
+    args.add_argument('--device', type=str, default=None)
+    args.add_argument('--resume', type=str, default=None)
     config = ConfigParser.from_args(args)
     
     # build model architecture, load checkpoints
     model = config.init_obj('arch', models)
-    model.load_state_dict(checkpoint)
+    model.load_state_dict(checkpoint['state_dict'])
+    model_name = config['name']
 
     # prepare for GPU environment
     device, device_ids = prepare_device(config['n_gpu'])
@@ -117,7 +119,10 @@ if __name__ == "__main__"':
         model = torch.nn.DataParallel(model, device_ids=device_ids)
     
     # Inference on test images
-    prediction_3d = segment_3d_input(model, path_to_image+volume_name)
+    prediction_3d = segment_3d_input(model, device, path_to_image+volume_name)
 
-    # Save results as nrrd & gif
-    saveImgWithSegmentations(prediction_3d, volume_name, save_dir='/content/drive/MyDrive/exp_results/test/')
+    # Save results as (nrrd &) gif
+    saveImgWithSegmentations(prediction_3d, 
+                             volume_name, 
+                             model_name, 
+                             save_dir='/content/drive/MyDrive/exp_results/test/')
