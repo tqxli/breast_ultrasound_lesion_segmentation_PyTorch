@@ -17,7 +17,7 @@
         "args":{
             "imgs_dir": "BUSI/BUSI_train/images/",
             "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
-            "resize_img": true,
+            "resize_img": false,
             "validation_split": 0.2, 
             "batch_size": 16,
             "shuffle": true,
@@ -28,19 +28,20 @@
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.0001,
+            "lr": 3e-4,
             "weight_decay": 1e-8,
             "amsgrad": true
         }
     },
-    "loss": "BCE_loss",
+    "loss": "DiceBCE_loss",
     "metrics": [
         "avg_iou", "avg_dice_coeff"
     ],
     "lr_scheduler": {
         "type": "ReduceLROnPlateau",
         "args": {
-            "patience": 3,
+            "patience": 4,
+            "gamma": 0.1, 
             "verbose": true
         }
     },
@@ -48,7 +49,7 @@
         "epochs": 100,
 
         "save_dir": "/content/drive/MyDrive/exp_results/",
-        "save_period": 10,
+        "save_period": 25,
         "verbosity": 2,
         
         "monitor": "off",

@@ -60,6 +60,7 @@ class DiceBCE_CE_JointLoss(nn.Module):
         return (1-self.beta) * classification_loss + self.beta * segmentation_loss 
 
 
+
 def DiceBCE_loss(inputs, targets):
     return DiceBCELoss().forward(inputs, targets)
 
@@ -72,11 +73,3 @@ def BCE_loss(inputs, targets):
 
 def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
     return DiceBCE_CE_JointLoss().forward(inputs, targets, pred_labels, true_labels, classification_class)
-    # classification_criterion = nn.CrossEntropyLoss()
-
-    # idx = true_labels != classification_class
-
-    # classification_loss = classification_criterion(pred_labels, true_labels)
-    # segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
-
-    # return classification_loss + segmentation_loss

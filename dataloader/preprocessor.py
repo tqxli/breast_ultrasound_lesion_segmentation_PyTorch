@@ -9,31 +9,43 @@ from numpy import clip
 import pandas as pd
 from skimage import io
 from skimage.color import rgb2gray
-from skimage.util import img_as_float, img_as_ubyte
+from skimage.util import img_as_ubyte
 from skimage.transform import resize
 from PIL import Image
 import random
 import io
+import albumentations as A
+import cv2
 
 class BUSIDataProcessor(Dataset):
-    def __init__(self, imgs_dir, masks_dir, resize_img=True):
+    def __init__(self, imgs_dir, masks_dir, resize_img=False):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
 
-        # Specify desired data transformations here:
-        self.transformations = transforms.Compose([
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomAffine(degrees=10),
-            transforms.RandomRotation(degrees=10)
-        ])
+        # Specify data augmentations
+        self.transformations = A.Compose([
+                A.Resize(256, 256),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.5),
+                A.ShiftScaleRotate(scale_limit=0.5, rotate_limit=0, shift_limit=0.1, p=0.5, border_mode=0),
+                A.GridDistortion(p=0.5),
+                A.ElasticTransform(),
+                A.torch.ToTensor()
+                ])
 
-        self.resize_img = resize_img
+        # self.transformations = transforms.Compose([
+        #     transforms.RandomHorizontalFlip(),
+        #     transforms.RandomVerticalFlip(),
+        #     transforms.RandomAffine(degrees=10),
+        #     transforms.RandomRotation(degrees=10)
+        # ])
+
+        #self.resize_img = resize_img
         self.imgs_ids = sorted(os.listdir(imgs_dir))
         self.mask_ids = sorted(os.listdir(masks_dir))
 
     @classmethod
-    def preprocess(cls, img, resize_img=True, expand_channel=False, adjust_label=False, normalize=False):
+    def preprocess(cls, img, resize_img=False, expand_channel=False, adjust_label=False, normalize=False):
         w, h = img.shape[0], img.shape[1]
 
         if expand_channel:
@@ -77,28 +89,40 @@ class BUSIDataProcessor(Dataset):
         img_file = self.imgs_dir + img_idx
         mask_file = self.masks_dir + mask_idx
         
-        mask = Image.open(mask_file)
-        img = Image.open(img_file)
+        # mask = Image.open(mask_file)
+        # img = Image.open(img_file)
         
         # Ensure same transformations to image and mask
-        seed = np.random.randint(2147483647) 
-        random.seed(seed) 
-        torch.manual_seed(seed) 
-        if self.transformations is not None:
-            img = self.transformations(img)
+        # seed = np.random.randint(2147483647) 
+        # random.seed(seed) 
+        # torch.manual_seed(seed) 
+        # if self.transformations is not None:
+        #     img = self.transformations(img)
                               
-        random.seed(seed) 
-        torch.manual_seed(seed) 
-        if self.transformations is not None:
-            mask = self.transformations(mask)
+        # random.seed(seed) 
+        # torch.manual_seed(seed) 
+        # if self.transformations is not None:
+        #     mask = self.transformations(mask)
 
-        img = np.asarray(img).astype('float32')
-        mask = np.asarray(mask).astype('float32')
+        img = cv2.imread(img_file).astype(np.float32)
+        mask = cv2.imread(mask_file).astype(np.float32)
 
+        #img = np.expand_dims(img, axis=2).transpose((2, 0, 1)) 
+        #mask = np.expand_dims(mask, dim=2).transpose((2, 0, 1))
+
+        # img = np.asarray(img).astype('float32')
+        # mask = np.asarray(mask).astype('float32')
         img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
         mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
         
-        return (torch.from_numpy(img), torch.from_numpy(mask))
+        # return (torch.from_numpy(img), torch.from_numpy(mask))        
+        random.seed(11)
+        if self.transformations is not None: 
+            transformed = self.transformations(image=img, mask=mask)
+            transformed_image = transformed['image']
+            transformed_mask = transformed['mask']
+
+        return (transformed_image, transformed_mask)
 
     def __len__(self):
         return len(self.imgs_ids)
