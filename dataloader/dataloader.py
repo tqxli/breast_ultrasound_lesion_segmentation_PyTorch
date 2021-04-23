@@ -10,7 +10,7 @@ class BUSIDataLoader(DataLoader):
             self.dataset = BUSIDataProcessor_with_labels(imgs_dir, masks_dir, labels_dir, resize_img=True)
             self.normal_samples_idx = self.dataset.get_normal_samples_idx()
         else:
-            self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, resize_img=True)
+            self.dataset = BUSIDataProcessor(imgs_dir, masks_dir)
             self.normal_samples_idx = []
         
         self.n_samples = len(self.dataset)
