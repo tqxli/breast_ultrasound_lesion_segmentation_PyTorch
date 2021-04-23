@@ -15,6 +15,7 @@ from PIL import Image
 import random
 import io
 import albumentations as A
+from albumentations.pytorch.transforms import ToTensorV2
 import cv2
 
 class BUSIDataProcessor(Dataset):
@@ -25,13 +26,15 @@ class BUSIDataProcessor(Dataset):
         # Specify data augmentations
         self.transformations = A.Compose([
                 A.Resize(256, 256),
+                A.RandomRotate90(p=0.5)
                 A.HorizontalFlip(p=0.5),
                 A.VerticalFlip(p=0.5),
                 A.ShiftScaleRotate(scale_limit=0.5, rotate_limit=0, shift_limit=0.1, p=0.5, border_mode=0),
+                A.RandomBrightnessContrast(p=0.2),
                 A.GridDistortion(p=0.5),
                 A.ElasticTransform(),
-                A.torch.ToTensor()
-                ])
+                ToTensorV2(),
+        ])
 
         # self.transformations = transforms.Compose([
         #     transforms.RandomHorizontalFlip(),
@@ -40,7 +43,7 @@ class BUSIDataProcessor(Dataset):
         #     transforms.RandomRotation(degrees=10)
         # ])
 
-        #self.resize_img = resize_img
+        self.resize_img = resize_img
         self.imgs_ids = sorted(os.listdir(imgs_dir))
         self.mask_ids = sorted(os.listdir(masks_dir))
 
@@ -112,8 +115,8 @@ class BUSIDataProcessor(Dataset):
 
         # img = np.asarray(img).astype('float32')
         # mask = np.asarray(mask).astype('float32')
-        img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
-        mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
+        img = self.preprocess(img, self.resize_img, expand_channel=True, adjust_label=False, normalize=True)
+        mask = self.preprocess(mask, self.resize_img, expand_channel=True, adjust_label=True, normalize=False)
         
         # return (torch.from_numpy(img), torch.from_numpy(mask))        
         random.seed(11)

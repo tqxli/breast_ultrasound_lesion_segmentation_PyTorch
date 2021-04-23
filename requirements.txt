@@ -1,4 +1,5 @@
 googledrivedownloader
 git+https://github.com/qubvel/segmentation_models.pytorch
-moviepy==1.0.3
-pynrrd==0.4.2
+moviepy
+pynrrd
+git+https://github.com/albumentations-team/albumentations

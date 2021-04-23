@@ -13,10 +13,11 @@ from utils import prepare_device
 
 def get_prediction(model, device, path_to_image=None):
     if path_to_image:
+        #image = cv2.imread(path_to_image, cv2.IMREAD_GRAYSCALE)
         image = io.imread(path_to_image)
             
         dataset = BUSIDataProcessor(imgs_dir=None, masks_dir=None)
-        processed = dataset.preprocess(image, expand_channel=False, adjust_label=False, normalize=True)
+        processed = dataset.preprocess(image, resize_img=True, expand_channel=False, adjust_label=False, normalize=True)
         img = torch.from_numpy(np.expand_dims(processed, axis=0))
             
         with torch.no_grad():
@@ -79,6 +80,9 @@ def saveImgWithSegmentations(segmented_volume, volume_name, model_name, save_dir
 
     filename = volume_name + '_' + model_name
 
+    if not os.path.isdir(save_dir): 
+        os.mkdir(save_dir)
+
     # Save as nrrd
     #nrrd.write(filename=save_dir+filename+'.nrrd', data=gray3d)
     #print('Successfully save results as nrrd.')
@@ -97,7 +101,6 @@ if __name__ == "__main__":
     # Select test images
     path_to_image = '/content/drive/MyDrive/data/sample_test_volumes/'
     volume_list = sorted(os.listdir(path_to_image))
-    volume_name = volume_list[1]
 
     # Initialize model
     args = argparse.ArgumentParser(description='Inference configuration')
@@ -118,11 +121,11 @@ if __name__ == "__main__":
     if len(device_ids) > 1:
         model = torch.nn.DataParallel(model, device_ids=device_ids)
     
-    # Inference on test images
-    prediction_3d = segment_3d_input(model, device, path_to_image+volume_name)
-
-    # Save results as (nrrd &) gif
-    saveImgWithSegmentations(prediction_3d, 
-                             volume_name, 
-                             model_name, 
-                             save_dir='/content/drive/MyDrive/exp_results/test/')
+    for volume_name in volume_list:
+        # Inference on test images
+        prediction_3d = segment_3d_input(model, device, path_to_image+volume_name)
+        # Save results as (nrrd &) gif
+        saveImgWithSegmentations(prediction_3d, 
+                                volume_name, 
+                                model_name, 
+                                save_dir='/content/drive/MyDrive/exp_results/test/')

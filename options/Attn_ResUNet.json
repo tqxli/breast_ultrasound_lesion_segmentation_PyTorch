@@ -8,7 +8,7 @@
             "encoder_name": "resnet18",        
             "encoder_weights": "imagenet",    
             "encoder_depth": 5, 
-            "in_channels": 1, 
+            "in_channels": 3, 
             "classes": 1
         }
     },
@@ -41,7 +41,7 @@
         "type": "ReduceLROnPlateau",
         "args": {
             "patience": 4,
-            "gamma": 0.1, 
+            "factor": 0.1, 
             "verbose": true
         }
     },
