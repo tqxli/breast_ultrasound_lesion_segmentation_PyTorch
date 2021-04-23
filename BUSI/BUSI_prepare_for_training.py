@@ -8,11 +8,11 @@ import os
 
 # os.rename('BUSI/BUSI_train_complete', 'BUSI/BUSI_train')
 
-gdd.download_file_from_google_drive(file_id='1cBVd68Gs35lewYLrJzBFj6NhvU4nuja-',
-                                    dest_path='./BUSI/BUSI_train_single_mass.zip',
+gdd.download_file_from_google_drive(file_id='1ugnqhVPIs9x7c6jeXEQtkojdHqnQnNf3',
+                                    dest_path='./BUSI/BUSI_new.zip',
                                     unzip=True)
                                     
 #with zipfile.ZipFile('BUSI/BUSI_train_single_mass.zip', 'r') as zip_ref:
 #    zip_ref.extractall('BUSI')
 
-os.rename('BUSI/BUSI_train_single_mass', 'BUSI/BUSI_train')
+os.rename('BUSI/BUSI_new', 'BUSI/BUSI_train')
