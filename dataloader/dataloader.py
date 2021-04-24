@@ -5,14 +5,10 @@ from torch.utils.data import DataLoader, SubsetRandomSampler, RandomSampler
 from .preprocessor import BUSIDataProcessor, BUSIDataProcessor_with_labels, TestDataset
 
 class BUSIDataLoader(DataLoader):
-    def __init__(self, imgs_dir, masks_dir, resize_img, validation_split, batch_size, shuffle, num_workers, pin_memory, do_classification=False, labels_dir=None):
-        if do_classification and labels_dir is not None:
-            self.dataset = BUSIDataProcessor_with_labels(imgs_dir, masks_dir, labels_dir, resize_img=True)
-            self.normal_samples_idx = self.dataset.get_normal_samples_idx()
-        else:
-            self.dataset = BUSIDataProcessor(imgs_dir, masks_dir)
-            self.normal_samples_idx = []
-        
+    def __init__(self, imgs_dir, masks_dir, validation_split, batch_size, shuffle, num_workers, pin_memory, labels_dir=None):
+
+        self.dataset = BUSIDataProcessor(imgs_dir, masks_dir, labels_dir)
+        self.normal_samples_idx = self.dataset.get_normal_samples_idx()
         self.n_samples = len(self.dataset)
         self.shuffle = shuffle
         self.validation_split = validation_split
@@ -53,12 +49,6 @@ class BUSIDataLoader(DataLoader):
         valid_idx = idx_rest[0:len_valid]
         train_idx = np.delete(idx_full, np.arange(0, len_valid))
 
-        """
-        Choose which specific sampler to use here:
-        SequentialSampler: Samples elements sequentially, always in the same order.
-        RandomSampler: Samples elements randomly. If without replacement, then sample from a shuffled dataset. 
-        SubsetRandomSampler: Samples elements randomly from a given list of indices, without replacement.
-        """
         train_sampler = SubsetRandomSampler(train_idx)
         valid_sampler = SubsetRandomSampler(valid_idx)
 

@@ -19,144 +19,70 @@ from albumentations.pytorch.transforms import ToTensorV2
 import cv2
 
 class BUSIDataProcessor(Dataset):
-    def __init__(self, imgs_dir, masks_dir):
+    def __init__(self, imgs_dir, masks_dir, labels_dir=None):
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
         self.images_filesnames = sorted(os.listdir(imgs_dir))
+        self.labels_dir = labels_dir
+        self.labels, self.negative_samples_idx = None, []
 
-        # Specify data augmentations
+        if labels_dir is not None: 
+            self.labels = pd.read_csv(labels_dir)['labels'].to_numpy()
+            self.negative_samples_idx = (self.labels == 2)
+        
+        # Specify data augmentations here
         self.transformations = A.Compose([
                 A.Resize(256, 256),
-                A.RandomRotate90(p=0.5),
-                A.HorizontalFlip(p=0.5),
-                A.VerticalFlip(p=0.5),
-                A.OneOf(
+                A.OneOf([
+                    A.RandomRotate90(p=0.5),
+                    A.HorizontalFlip(p=0.5),
+                    A.VerticalFlip(p=0.5),
                     A.ShiftScaleRotate(scale_limit=0.5, rotate_limit=0, shift_limit=0.1, p=0.5, border_mode=0),
                     A.RandomBrightnessContrast(p=0.2),
                     A.GridDistortion(p=0.2),
                     A.ElasticTransform(p=0.2)
-                ), 
-                A.Normalize(),
-                ToTensorV2(),
+                ]), 
         ])
-        
-    def __len__(self):
-        return len(self.images_filesnames)
-
-    def __getitem__(self, i):
-        img_filename = self.images_filesnames[i]
-
-        img = cv2.imread(os.path.join(self.imgs_dir, img_filename)).astype(np.float32)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        mask = cv2.imread(os.path.join(self.masks_dir, img_filename)).astype(np.float32)
-
-        random.seed(1234)
-        if self.transformations is not None: 
-            transformed = self.transformations(image=img, mask=mask)
-            transformed_image = transformed['image']
-            transformed_mask = transformed['mask']
-
-        return (transformed_image, transformed_mask)
-
-
-
-class BUSIDataProcessor_with_labels(Dataset):
-    def __init__(self, imgs_dir, masks_dir, labels_dir, resize_img=True):
-        self.imgs_dir = imgs_dir
-        self.masks_dir = masks_dir
-        self.labels_dir = labels_dir
-        self.labels = pd.read_csv(labels_dir)['labels'].to_numpy()
-
-        self.normal_samples_idx = (self.labels == 2)
-
-        # Specify desired data transformations here:
-        self.transformations = transforms.Compose([
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomAffine(degrees=10),
-            transforms.RandomRotation(degrees=10)
-        ])
-
-        self.resize_img = resize_img
-        self.imgs_ids = sorted(os.listdir(imgs_dir))
-        self.mask_ids = sorted(os.listdir(masks_dir))
-
-    @classmethod
-    def preprocess(cls, img, resize_img=True, expand_channel=False, adjust_label=False, normalize=False):
-        w, h = img.shape[0], img.shape[1]
-
-        if expand_channel:
-            if len(img.shape) == 2:
-                img = np.dstack([img]*3)
-        # For mask, 
-        if len(img.shape) == 2:
-            img = np.expand_dims(img, axis=2)
-            
-        img = img.transpose((2, 0, 1))
-        
-        if resize_img:
-            new_size = 256
-            assert new_size <= w or new_size <= h, 'Resize cannot be greater than image size'
-            
-            if expand_channel:
-                img = resize(img, (3, new_size, new_size))
-            else: 
-                img = resize(img, (1, new_size, new_size))
-            
-        # Standarize pixel values
-        if normalize:
-            img_min = img.min(axis=(1, 2), keepdims=True)
-            img_max = img.max(axis=(1, 2), keepdims=True)
-                
-            img = (img - img_min)/(img_max-img_min)
-            img = (img - img.mean()) / img.std()
-            img = clip(img, -1.0, 1.0)
-            img = (img + 1.0) / 2.0
-            
-        # For mask to have values between 0 and 1
-        if adjust_label:
-            coords = np.where(img != 0)
-            img[coords] = 1
-
-        return img
 
     def get_normal_samples_idx(self):
         return self.normal_samples_idx
-
+        
     def __getitem__(self, i):
-        img_idx = self.imgs_ids[i]
-        mask_idx = self.mask_ids[i]
-
-        img_file = self.imgs_dir + img_idx
-        mask_file = self.masks_dir + mask_idx
-
-        mask = Image.open(mask_file)
-        img = Image.open(img_file)
+        img_filename = self.images_filesnames[i]
         
-        # Ensure same transformations to image and mask
-        seed = np.random.randint(2147483647) 
-        random.seed(seed) 
-        torch.manual_seed(seed) 
-        if self.transformations is not None:
-            img = self.transformations(img)
-                              
-        random.seed(seed) 
-        torch.manual_seed(seed) 
-        if self.transformations is not None:
-            mask = self.transformations(mask)
+        img = cv2.imread(os.path.join(self.imgs_dir, img_filename)).astype(np.float32) # [H, W, 3]
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        mask = cv2.imread(os.path.join(self.masks_dir, img_filename), cv2.IMREAD_GRAYSCALE).astype(np.float32) # [H, W]
+        mask = np.expand_dims(mask, -1) # [H, W, 1] 
 
-        img = np.asarray(img).astype('float32')
-        mask = np.asarray(mask).astype('float32')
+        random.seed(123456)
+        if self.transformations is not None: 
+            transformed = self.transformations(image=img, mask=mask)
+            img = transformed['image']
+            mask = transformed['mask']
 
-        img = self.preprocess(img, self.resize_img, expand_channel=False, adjust_label=False, normalize=True)
-        mask = self.preprocess(mask, self.resize_img, expand_channel=False, adjust_label=True, normalize=False)
-        label = np.asarray(self.labels[i])
+        img = normalize(img) 
+        mask = mask / 255.0 
+
+        img = np.transpose(img, (2, 0, 1))
+        mask = np.transpose(mask, (2, 0, 1))
         
-        return (torch.from_numpy(img), torch.from_numpy(mask), torch.from_numpy(label))
+        if self.labels_dir is not None:
+            label = np.asarray(self.labels[i])
+            return (torch.from_numpy(img), torch.from_numpy(mask), torch.from_numpy(label)) 
+
+        return (torch.from_numpy(img), torch.from_numpy(mask)) 
 
     def __len__(self):
-        return len(self.imgs_ids)
+        return len(self.images_filesnames)
+
+    def normalize(pixels):
+        mean, std = pixels.mean(), pixels.std()
+        pixels = (pixels - mean) / std
+        pixels = np.clip(pixels, -1.0, 1.0)
+        pixels = (pixels + 1.0) / 2.0   
+
+        return pixels
 
 class TestDataset(Dataset):
     def __init__(self, imgs_dir):
