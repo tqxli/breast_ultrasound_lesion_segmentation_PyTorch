@@ -16,7 +16,7 @@ import model.models as models
 import model.losses as losses
 import model.metrics as metrics
 from utils import prepare_device
-from trainer import Trainer, Trainer_extra_classification
+from trainer import Trainer, Trainer_cl
 
 
 def main(config):
@@ -46,7 +46,7 @@ def main(config):
     lr_scheduler = config.init_obj('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
     # Start training
-    trainer = Trainer(model, criterion, selected_metrics, optimizer,
+    trainer = Trainer_cl(model, criterion, selected_metrics, optimizer,
                       config=config,
                       device=device,
                       data_loader=data_loader,

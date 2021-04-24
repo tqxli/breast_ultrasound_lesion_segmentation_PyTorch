@@ -1,5 +1,5 @@
 {
-    "name": "Attn_ResUNet_plus_classification",
+    "name": "Attn_ResUNet_binary_cl",
     "n_gpu": 1, 
 
     "arch": {
@@ -8,8 +8,8 @@
             "aux_params": {
                 "pooling": "max",             
                 "dropout": 0.1,               
-                "activation": "softmax",    
-                "classes": 3
+                "activation": "sigmoid",    
+                "classes": 2
             }  
         }
     },
@@ -18,20 +18,18 @@
         "args":{
             "imgs_dir": "BUSI/BUSI_train/images/",
             "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
-            "resize_img": true,
             "validation_split": 0.2, 
             "batch_size": 16,
             "shuffle": true,
             "num_workers": 0,
             "pin_memory": true,
-            "do_classification": true,
             "labels_dir": "BUSI/BUSI_train/classes.csv"
         }
     },
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.0001,
+            "lr": 3e-4,
             "weight_decay": 1e-8,
             "amsgrad": true
         }
@@ -43,7 +41,8 @@
     "lr_scheduler": {
         "type": "ReduceLROnPlateau",
         "args": {
-            "patience": 3,
+            "patience": 4,
+            "factor": 0.1, 
             "verbose": true
         }
     },
@@ -51,7 +50,7 @@
         "epochs": 50,
 
         "save_dir": "/content/drive/MyDrive/exp_results/",
-        "save_period": 10,
+        "save_period": 25,
         "verbosity": 2,
         
         "monitor": "off",

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class DiceBCELoss(nn.Module):
-    def __init__(self, alpha = 0.5, weight=None, size_average=True):
+    def __init__(self, alpha = 0.5):
         self.alpha = alpha
         super(DiceBCELoss, self).__init__()
 
@@ -42,23 +42,23 @@ class DiceLoss(nn.Module):
 class DiceBCE_CE_JointLoss(nn.Module):
     """
     A custom loss for combining segmentation DiceBCE loss with an additional classification Cross Entropy loss.
+
     Parameters:
         beta: a scalar that controls ratio between the two losses.
     """
-    def __init__(self, beta=0.5):
+    def __init__(self, beta=0.1):
         super(DiceBCE_CE_JointLoss, self).__init__()
         self.beta = beta
     
     def forward(self, inputs, targets, pred_labels, true_labels, classification_class=2):
-        classification_criterion = nn.CrossEntropyLoss()
+        classification_criterion = nn.BCELoss()
 
         idx = true_labels != classification_class
 
         classification_loss = classification_criterion(pred_labels, true_labels)
-        segmentation_loss = DiceBCELoss().forward(inputs[idx, :], targets[idx, :]) 
+        segmentation_loss = DiceBCE_loss(inputs[idx, :], targets[idx, :]) 
 
-        return (1-self.beta) * classification_loss + self.beta * segmentation_loss 
-
+        return self.beta * classification_loss + (1-self.beta) * segmentation_loss 
 
 
 def DiceBCE_loss(inputs, targets):

@@ -9,7 +9,7 @@
             "encoder_weights": "imagenet",    
             "encoder_depth": 5, 
             "in_channels": 3, 
-            "classes": 3
+            "classes": 1
         }
     },
     "data_loader": {
@@ -17,12 +17,11 @@
         "args":{
             "imgs_dir": "BUSI/BUSI_train/images/",
             "masks_dir": "BUSI/BUSI_train/mask_ground_truth/",
-            "resize_img": false,
             "validation_split": 0.2, 
             "batch_size": 16,
             "shuffle": true,
             "num_workers": 0,
-            "pin_memory": true
+            "pin_memory": true,
         }
     },
     "optimizer": {
