@@ -16,7 +16,7 @@ import model.models as models
 import model.losses as losses
 import model.metrics as metrics
 from utils import prepare_device
-from trainer import Trainer, Trainer_cl
+from trainer import Trainer
 
 
 def main(config):
