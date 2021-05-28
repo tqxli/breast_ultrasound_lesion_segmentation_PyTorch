@@ -8,8 +8,8 @@ import os
 
 # os.rename('BUSI/BUSI_train_complete', 'BUSI/BUSI_train')
 
-gdd.download_file_from_google_drive(file_id='1xF5a5LE3PbJbT-Qv0sJiUa307h-kStKf',
-                                    dest_path='./BUSI/BUSI_new.zip',
+gdd.download_file_from_google_drive(file_id='your-google-drive-dataset-id',
+                                    dest_path='./BUSI/BUSI.zip',
                                     unzip=True)
 
-os.rename('BUSI/BUSI_new', 'BUSI/BUSI_train')
+os.rename('BUSI/BUSI', 'BUSI/BUSI_train')
