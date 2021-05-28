@@ -16,6 +16,8 @@ Both ground truth masks and original images are provided.
 
 Normal images are not used during training.
 
+    For preprocessing, you should rearrange the data into two separate folders "images" and "mask_ground_truth".
+
 ### Models (work in progress)
 * UNet with ResNet backbone (ResUNet)
 * ResUNet with attention
