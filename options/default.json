@@ -1,16 +1,15 @@
 {
-    "name": "Attn_ResUNet_binary_cl",
+    "name": "ResUNet",
     "n_gpu": 1, 
 
     "arch": {
         "type": "Attention_ResUNet",
-        "args": {
-            "aux_params": {
-                "pooling": "max",             
-                "dropout": 0.1,               
-                "activation": "sigmoid",    
-                "classes": 2
-            }  
+        "args": {    
+            "encoder_name": "resnet18",        
+            "encoder_weights": "imagenet",    
+            "encoder_depth": 5, 
+            "in_channels": 3, 
+            "classes": 1
         }
     },
     "data_loader": {
@@ -22,8 +21,7 @@
             "batch_size": 16,
             "shuffle": true,
             "num_workers": 0,
-            "pin_memory": true,
-            "labels_dir": "BUSI/BUSI_train/classes.csv"
+            "pin_memory": true
         }
     },
     "optimizer": {
@@ -34,7 +32,7 @@
             "amsgrad": true
         }
     },
-    "loss": "DiceBCE_CE_loss",
+    "loss": "DiceBCE_loss",
     "metrics": [
         "avg_iou", "avg_dice_coeff"
     ],
@@ -47,7 +45,7 @@
         }
     },
     "trainer": {
-        "epochs": 50,
+        "epochs": 100,
 
         "save_dir": "/content/drive/MyDrive/exp_results/",
         "save_period": 25,
@@ -56,6 +54,6 @@
         "monitor": "off",
         "early_stop": 20,
 
-        "tensorboard": false
+        "tensorboard": true
     }
 }

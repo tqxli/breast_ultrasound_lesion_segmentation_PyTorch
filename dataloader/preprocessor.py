@@ -28,7 +28,10 @@ class BUSIDataProcessor(Dataset):
 
         if labels_dir is not None: 
             self.labels = pd.read_csv(labels_dir)['labels'].to_numpy()
-            self.negative_samples_idx = (self.labels == 2)
+            # For now: use 1 for benign/malignant, 0 for normal
+            self.labels[self.labels != 2] = 1
+            self.labels[self.labels == 2] = 0
+            self.negative_samples_idx = (self.labels == 0)
         
         # Specify data augmentations here
         self.transformations = A.Compose([
@@ -45,7 +48,7 @@ class BUSIDataProcessor(Dataset):
         ])
 
     def get_normal_samples_idx(self):
-        return self.normal_samples_idx
+        return self.negative_samples_idx
         
     def __getitem__(self, i):
         img_filename = self.images_filesnames[i]
@@ -76,13 +79,13 @@ class BUSIDataProcessor(Dataset):
     def __len__(self):
         return len(self.images_filesnames)
 
-    def normalize(pixels):
-        mean, std = pixels.mean(), pixels.std()
-        pixels = (pixels - mean) / std
-        pixels = np.clip(pixels, -1.0, 1.0)
-        pixels = (pixels + 1.0) / 2.0   
+def normalize(pixels):
+    mean, std = pixels.mean(), pixels.std()
+    pixels = (pixels - mean) / std
+    pixels = np.clip(pixels, -1.0, 1.0)
+    pixels = (pixels + 1.0) / 2.0   
 
-        return pixels
+    return pixels
 
 class TestDataset(Dataset):
     def __init__(self, imgs_dir):

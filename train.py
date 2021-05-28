@@ -46,7 +46,7 @@ def main(config):
     lr_scheduler = config.init_obj('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
     # Start training
-    trainer = Trainer_cl(model, criterion, selected_metrics, optimizer,
+    trainer = Trainer(model, criterion, selected_metrics, optimizer,
                       config=config,
                       device=device,
                       data_loader=data_loader,

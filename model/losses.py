@@ -39,26 +39,26 @@ class DiceLoss(nn.Module):
         
         return 1 - dice
 
-class DiceBCE_CE_JointLoss(nn.Module):
-    """
-    A custom loss for combining segmentation DiceBCE loss with an additional classification Cross Entropy loss.
+# class DiceBCE_CE_JointLoss(nn.Module):
+#     """
+#     A custom loss for combining segmentation DiceBCE loss with an additional classification Cross Entropy loss.
 
-    Parameters:
-        beta: a scalar that controls ratio between the two losses.
-    """
-    def __init__(self, beta=0.1):
-        super(DiceBCE_CE_JointLoss, self).__init__()
-        self.beta = beta
+#     Parameters:
+#         beta: a scalar that controls ratio between the two losses.
+#     """
+#     def __init__(self, beta=0.1):
+#         super(DiceBCE_CE_JointLoss, self).__init__()
+#         self.beta = beta
     
-    def forward(self, inputs, targets, pred_labels, true_labels, classification_class=2):
-        classification_criterion = nn.BCELoss()
+#     def forward(self, inputs, targets, pred_labels, true_labels, classification_class=0):
+#         classification_criterion = nn.CrossEntropyLoss()
 
-        idx = true_labels != classification_class
+#         idx = true_labels != classification_class
 
-        classification_loss = classification_criterion(pred_labels, true_labels)
-        segmentation_loss = DiceBCE_loss(inputs[idx, :], targets[idx, :]) 
+#         classification_loss = classification_criterion(pred_labels, true_labels)
+#         segmentation_loss = DiceBCE_loss(inputs[idx, :], targets[idx, :]) 
 
-        return self.beta * classification_loss + (1-self.beta) * segmentation_loss 
+#         return self.beta * classification_loss + (1-self.beta) * segmentation_loss 
 
 
 def DiceBCE_loss(inputs, targets):
@@ -71,5 +71,5 @@ def BCE_loss(inputs, targets):
     criterion = nn.BCELoss()
     return criterion(inputs, targets)
 
-def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
-    return DiceBCE_CE_JointLoss().forward(inputs, targets, pred_labels, true_labels, classification_class)
+# def DiceBCE_CE_loss(inputs, targets, pred_labels, true_labels, classification_class=2):
+#     return DiceBCE_CE_JointLoss().forward(inputs, targets, pred_labels, true_labels, classification_class)
