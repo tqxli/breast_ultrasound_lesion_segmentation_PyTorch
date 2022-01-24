@@ -1,4 +1,5 @@
-## Breast Ultrasound Segmentation
+# Breast Ultrasound Segmentation
+**This repository is no longer actively maintained.**
 
 Easy implementation for different models in **PyTorch** for breast ultrasound lesion segmentation. 
 
